@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>מחשבון אחוזים</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="אחוזים">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f1117">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230f1117'/%3E%3Ctext x='50' y='62' font-size='52' text-anchor='middle' fill='%234f7cff' font-family='Arial' font-weight='900'%3E%25%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --card2: #20232f;
+    --border: #2e3245;
+    --accent: #4f7cff;
+    --green: #22c77a;
+    --red: #ff4d6d;
+    --text: #e8eaf0;
+    --muted: #7a7f9a;
+    --input-bg: #12141d;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 40px 0;
+  }
+
+  header {
+    background: linear-gradient(135deg, #1a1d27 0%, #12141d 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 20px 16px;
+    text-align: center;
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #4f7cff, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  header p {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    margin: 16px 16px 0;
+    background: var(--card);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .tab {
+    flex: 1;
+    padding: 10px 6px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Heebo', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .tab.active {
+    background: var(--accent);
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 2px 10px rgba(79,124,255,0.35);
+  }
+
+  /* Panels */
+  .panel { display: none; padding: 16px; }
+  .panel.active { display: block; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+
+  .field-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .field-row:last-child { margin-bottom: 0; }
+
+  .field-label {
+    font-size: 13px;
+    color: var(--muted);
+    min-width: 72px;
+    font-weight: 500;
+  }
+
+  input[type="number"] {
+    flex: 1;
+    background: var(--input-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'Heebo', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: right;
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  input[type="number"]:focus {
+    border-color: var(--accent);
+  }
+
+  .result-inline {
+    min-width: 72px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    transition: all 0.3s;
+  }
+
+  .result-inline.up { color: var(--green); }
+  .result-inline.down { color: var(--red); }
+  .result-inline.zero { color: var(--muted); }
+
+  /* Result box */
+  .result-box {
+    background: var(--input-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 14px;
+    text-align: center;
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .result-big {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .result-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* Table panel */
+  .table-scroll {
+    max-height: 420px;
+    overflow-y: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    background: var(--card2);
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    position: sticky;
+    top: 0;
+  }
+
+  tbody tr {
+    border-top: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:hover { background: var(--card2); }
+
+  tbody td {
+    padding: 12px 14px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .pct-col { color: var(--muted); font-size: 13px; }
+  .val-col { font-weight: 700; }
+  .val-col.up { color: var(--green); }
+  .val-col.down { color: var(--red); }
+
+  .diff-col {
+    font-size: 12px;
+  }
+  .diff-col.up { color: var(--green); }
+  .diff-col.down { color: var(--red); }
+
+  .empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  .badge-up { background: rgba(34,199,122,0.15); color: var(--green); }
+  .badge-down { background: rgba(255,77,109,0.15); color: var(--red); }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0 14px 0;
+  }
+
+  .hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>מחשבון אחוזים</h1>
+  <p>כלי מקצועי לחישוב שינויי מחיר</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('pct')">% שינוי</button>
+  <button class="tab" onclick="switchTab('ladder')">מדרגות</button>
+</div>
+
+<!-- Panel 1: % change -->
+<div id="panel-pct" class="panel active">
+  <div class="card">
+    <div class="card-title">חישוב אחוז שינוי</div>
+    <div class="field-row">
+      <span class="field-label">מחיר פתיחה</span>
+      <input type="number" id="p1-start" placeholder="" oninput="calcPct()">
+    </div>
+    <div class="field-row">
+      <span class="field-label">מחיר סגירה</span>
+      <input type="number" id="p1-end" placeholder="" oninput="calcPct()">
+    </div>
+    <div class="divider"></div>
+    <div class="result-box" id="pct-box">
+      <span style="color:var(--muted);font-size:14px">הזן מחירים לחישוב</span>
+    </div>
+  </div>
+</div>
+
+<!-- Panel 2: ladder -->
+<div id="panel-ladder" class="panel">
+  <div class="card">
+    <div class="card-title">הגדרות מדרגות</div>
+    <div class="field-row">
+      <span class="field-label">ערך בסיס</span>
+      <input type="number" id="p2-base" placeholder="" oninput="calcLadder()">
+    </div>
+    <div class="field-row">
+      <span class="field-label">אחוז מקסימום</span>
+      <input type="number" id="p2-max" placeholder="" oninput="calcLadder()">
+      <span style="color:var(--muted);font-size:15px;min-width:24px">%</span>
+    </div>
+    <p class="hint">המדרגות יחושבו מ-1% עד האחוז המוזן</p>
+  </div>
+
+  <div id="ladder-output">
+    <div class="empty-state">הזן ערכים לחישוב המדרגות</div>
+  </div>
+</div>
+
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', (i===0&&id==='pct')||(i===1&&id==='ladder'));
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+}
+
+function fmt(n) {
+  if (n === Math.floor(n)) return n.toLocaleString('he-IL');
+  return n.toLocaleString('he-IL', {minimumFractionDigits:1, maximumFractionDigits:2});
+}
+
+function calcPct() {
+  const s = parseFloat(document.getElementById('p1-start').value);
+  const e = parseFloat(document.getElementById('p1-end').value);
+  const box = document.getElementById('pct-box');
+
+  if (!s || isNaN(s) || isNaN(e) || s === 0) {
+    box.innerHTML = '<span style="color:var(--muted);font-size:14px">הזן מחירים לחישוב</span>';
+    return;
+  }
+
+  const pct = ((e - s) / Math.abs(s)) * 100;
+  const diff = e - s;
+  const isUp = pct > 0;
+  const isZero = pct === 0;
+  const sign = isUp ? '+' : '';
+  const cls = isZero ? 'zero' : (isUp ? 'up' : 'down');
+
+  const diffColor = isZero ? 'var(--muted)' : (isUp ? 'var(--green)' : 'var(--red)');
+  const badge = isZero ? '' : `<span class="badge ${isUp?'badge-up':'badge-down'}">${isUp?'עלייה':'ירידה'}</span>`;
+
+  box.innerHTML = `
+    <div class="result-big" style="color:${diffColor}">${sign}${fmt(pct)}%</div>
+    <div class="result-sub">${badge} שינוי: ${sign}${fmt(diff)}</div>
+  `;
+}
+
+function calcLadder() {
+  const base = parseFloat(document.getElementById('p2-base').value);
+  const maxP = parseFloat(document.getElementById('p2-max').value);
+  const out = document.getElementById('ladder-output');
+
+  if (!base || isNaN(base) || !maxP || isNaN(maxP) || maxP === 0) {
+    out.innerHTML = '<div class="empty-state">הזן ערכים לחישוב המדרגות</div>';
+    return;
+  }
+
+  const absSteps = Math.min(Math.abs(Math.round(maxP)), 200);
+  const direction = maxP < 0 ? -1 : 1;
+
+  let rows = '';
+  for (let i = 1; i <= absSteps; i++) {
+    const pct = i * direction;
+    const val = base * (1 + pct / 100);
+    const diff = val - base;
+    const cls = diff >= 0 ? 'up' : 'down';
+    const sign = diff > 0 ? '+' : '';
+    rows += `
+      <tr>
+        <td class="pct-col">${pct}%</td>
+        <td class="val-col ${cls}">${fmt(val)}</td>
+        <td class="diff-col ${cls}">${sign}${fmt(diff)}</td>
+      </tr>`;
+  }
+
+  out.innerHTML = `
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>אחוז</th>
+            <th>ערך</th>
+            <th>שינוי</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+</script>
+</body>
+</html>
